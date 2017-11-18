@@ -10,10 +10,13 @@ Encryption is done with open_ssl AES-256-CBC method.
 Instruction (standard secretkey is provided as private static property in class):
 
 $encrypted_txt    = Cryptor::doEncrypt($plain_txt);
+
 $plain_txt        = Cryptor::doDecrypt($encrypted_txt);
 
 Or:
+
 $encrypted_txt    = Cryptor::doEncrypt($plain_txt, 'secretkey');
+
 $plain_txt        = Cryptor::doDecrypt($encrypted_txt, 'secretkey');
 
 
