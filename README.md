@@ -8,5 +8,7 @@ Works without mcrypt.
 Encryption is done with open_ssl AES-256-CBC method.
 
 Instruction:
+
 $encrypted_txt    = Cryptor::doEncrypt($plain_txt);
+
 $plain_txt        = Cryptor::doDecrypt($encrypted_txt);
