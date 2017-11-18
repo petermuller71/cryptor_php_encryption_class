@@ -31,7 +31,6 @@ class Cryptor {
      * @param      string       $encrypted_txt    Text, to be decrypted
      * @param      string       $secretkey        Optional, override with (static private) property 
      * 
-     * @property   int          $unique_nr        Amount of random characters put in front en behind encrypted string + used as salt
      * @property   int          $strspit_nr       Amount of characters to split source (<= 400!), open_ssl cannot encrypt large files
      * @property   string       $rep_letter       Letter used to replace underscore (prevent detecting str_splits)
      * @property   string       $secret_key       Secret_key (sha512 hashvalue is created from this string)
