@@ -7,13 +7,13 @@ Works without mcrypt.
 
 Encryption is done with open_ssl AES-256-CBC method.
 
-# Instruction (standard secretkey is provided as private static property in class):
+## Instruction (standard secretkey is provided as private static property in class):
 
 $encrypted_txt    = Cryptor::doEncrypt($plain_txt);
 
 $plain_txt        = Cryptor::doDecrypt($encrypted_txt);
 
-# Or:
+## Or:
 
 $encrypted_txt    = Cryptor::doEncrypt($plain_txt, 'secretkey');
 
