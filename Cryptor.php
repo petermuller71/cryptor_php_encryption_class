@@ -5,14 +5,14 @@
  * Class:  Cryptor
  * 
  * PHP Encryption and decryption class with open_ssl
- * Works also with larger text (because text is split in smaller parts)
- * generates a random IV with openssl_random_pseudo_bytes for each message
- * generates a random nonce (number used once) with openssl_random_pseudo_bytes used as salt for each message 
- * Purpose of random IV and nonce: When the same message is encrypted twice, the encrypted_text is always different
- * IVs and nonces do not have to be kept secret. They are prefixed to the encrypted_text and transmitted in full public view
- * Generates a hash of the encrypted data for integrity check and is prefixed to the encrypted_text
+ * Works also with larger text (because text is split in smaller parts).
+ * Generates a random IV with openssl_random_pseudo_bytes for each message and is prefixed to the encrypted_text.
+ * Generates a random nonce (number used once) with openssl_random_pseudo_bytes used as salt for each message. 
+ * Purpose of random IV and nonce: When the same message is encrypted twice, the encrypted_text is always different.
+ * IVs do not have to be kept secret. They are prefixed to the encrypted_text and transmitted in full public view.
+ * A hash of the encrypted data is generated for integrity-check and is prefixed to the encrypted_text.
  *
- * Instruction (no secret key provided):
+ * Instruction (no secret key provided as argument):
  * encryption:  $encrypted_txt    = Cryptor::doEncrypt($plain_txt);
  * decryption:  $plain_txt        = Cryptor::doDecrypt($encrypted_txt);
  *
@@ -29,18 +29,20 @@ class Cryptor {
 
 
     /**
-     * Class to encrypt or decrypt a plain_text string with open_ssl
-     * open_ssl cannot handle large files. Therefore source is split in smaller parts, and afterwards glued together again
-     * generates a random IV with openssl_random_pseudo_bytes for each message
-     * generates a random nonce (number used once) with openssl_random_pseudo_bytes used as salt for each message 
+     * PHP Encryption and decryption class with open_ssl
+     * Works also with larger text (because text is split in smaller parts).
+     * Generates a random IV with openssl_random_pseudo_bytes for each message and is prefixed to the encrypted_text.
+     * Generates a random nonce (number used once) with openssl_random_pseudo_bytes used as salt for each message. 
+     * Purpose of random IV and nonce: When the same message is encrypted twice, the encrypted_text is always different.
+     * IVs do not have to be kept secret. They are prefixed to the encrypted_text and transmitted in full public view.
+     * A hash of the encrypted data is generated for integrity-check and is prefixed to the encrypted_text.
      * 
-     * IVs and nonces do not have to be kept secret. They are prefixed to the encrypted_text and transmitted in full public view
-     * Furthermore: a hash of the encrypted data (for an integrity check) is prefixed to the encrypted_text
-     * 
+     * public gist: 
+     * https://gist.github.com/petermuller71/33616d55174d9725fc00a663d30194ba
      *
      * @param      string       $plain_txt        Text, to be encrypted
      * @param      string       $encrypted_txt    Text, to be decrypted
-     * @param      string       $secretkey        Optional, override with (static private) property 
+     * @param      string       $secret_key       Optional, override with (static private) property 
      * 
      * @property   int          $strspit_nr       Amount of characters to split source (<= 400!), open_ssl cannot encrypt large files
      * @property   string       $rep_letter       Letter used to replace underscore (prevent detecting str_splits)
@@ -75,7 +77,6 @@ class Cryptor {
         
        // add salt to plain_text 
        // salt is actually a nonce (unpredictable random number), so encryption of the same plain_text will leads always to different encrypted_texts  
-       // See: http://www.cryptofails.com/post/70059609995/crypto-noobs-1-initialization-vectors
        
        $salt      = substr( base64_encode(openssl_random_pseudo_bytes(16)), 0, 10);    
        $plain_txt = $salt.$plain_txt;
@@ -91,7 +92,7 @@ class Cryptor {
        
        $encrypted_txt = self::replace("go", $encrypted_txt);
        
-       // add hash (for integraty check) to result
+       // add hash (for integraty check) to encrypted_txt
        
        $hash  = substr( hash('sha512', $encrypted_txt) , 0, 10);       
        $encrypted_txt = $hash.$encrypted_txt;
@@ -118,6 +119,9 @@ class Cryptor {
        // get hash, prefixed to encrypted_txt
        
        $hash          = substr($encrypted_txt, 0, 10);
+       
+       // remove hash from encrypted_txt
+       
        $encrypted_txt = substr($encrypted_txt, 10);
        
        // check if hash is correct (compare with hash_on_the_fly)
@@ -168,13 +172,20 @@ class Cryptor {
         {
         
             $output = openssl_encrypt($source, "AES-256-CBC", $secretkey, 0, $iv);
+            
+            // add $iv to encrypted_txt
+            
             $output = $iv.base64_encode($output);
         
         } 
         else if( $action == 'decrypt' ) 
         {
+            // get $iv
             $iv     = substr($source, 0, 16);
+            
+            // remove $iv from source
             $source = substr($source, 16);
+            
             $output = openssl_decrypt(base64_decode($source), "AES-256-CBC", $secretkey, 0, $iv);
             
         }
@@ -187,6 +198,7 @@ class Cryptor {
     /*
      * Replace 
      * replace underscore (_) by a specific letter (and vice versa)
+     * purpose: in this way, you cannot check how long the chuncks are
      * 
      * @param   string    $action   Replace underscore by a letter (go) or letter by underscore (back)
      * @param   string    $source   Source where replacement is done
