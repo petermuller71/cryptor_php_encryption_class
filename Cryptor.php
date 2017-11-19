@@ -5,6 +5,7 @@
  * Class:  Cryptor
  * 
  * PHP Encryption and decryption class with open_ssl
+ * 
  * Works also with larger text (because text is split in smaller parts).
  * Generates a random IV with openssl_random_pseudo_bytes for each message and is prefixed to the encrypted_text.
  * Generates a random nonce (number used once) with openssl_random_pseudo_bytes used as salt for each message. 
@@ -29,13 +30,7 @@ class Cryptor {
 
 
     /**
-     * PHP Encryption and decryption class with open_ssl
-     * Works also with larger text (because text is split in smaller parts).
-     * Generates a random IV with openssl_random_pseudo_bytes for each message and is prefixed to the encrypted_text.
-     * Generates a random nonce (number used once) with openssl_random_pseudo_bytes used as salt for each message. 
-     * Purpose of random IV and nonce: When the same message is encrypted twice, the encrypted_text is always different.
-     * IVs do not have to be kept secret. They are prefixed to the encrypted_text and transmitted in full public view.
-     * A hash of the encrypted data is generated for integrity-check and is prefixed to the encrypted_text.
+     * PHP Encryption and decryption class :: open_ssl
      * 
      * public gist: 
      * https://gist.github.com/petermuller71/33616d55174d9725fc00a663d30194ba
@@ -50,9 +45,11 @@ class Cryptor {
 
      * 
      * @return     string       Encrypted or decrypted text
-     * 
+     *
+     * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
+     * @copyright  2017 Peter Muller. All rights reserved.
      * @author     Peter Muller <petermuller71@gmail.com>
-     * @version    1.04
+     * @version    1.05
      *
      */
     
@@ -81,7 +78,7 @@ class Cryptor {
        $salt      = substr( base64_encode(openssl_random_pseudo_bytes(16)), 0, 10);    
        $plain_txt = $salt.$plain_txt;
        
-       // $plain_text should be split in smaller parts and encrypted seperatly
+       // plain_txt should be split in smaller parts and encrypted seperatly (because of open_ssl / RSA limitation)
       
        $arr = str_split($plain_txt, self::$strspit_nr);
        foreach ($arr as $v) { $encrypted_txt .= substr(self::doEncryptDecrypt('encrypt', $secretkey, $v), 0, -2)."_"; }
@@ -134,7 +131,7 @@ class Cryptor {
        
        $encrypted_txt   = self::replace("back", $encrypted_txt);
 
-       // encrypted_txt should be split in smaller parts and decrypted seperatly
+       // encrypted_txt should be split in smaller parts and decrypted seperatly (because open_ssl / RSA limitation)
        
        $arr  = explode("_", $encrypted_txt);
        foreach ($arr as $v) { $decrypted_txt .= self::doEncryptDecrypt('decrypt', $secretkey, $v); }
