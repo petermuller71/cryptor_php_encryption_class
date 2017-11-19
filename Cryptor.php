@@ -12,7 +12,7 @@
  * IVs do not have to be kept secret. They are prefixed to the encrypted_text and transmitted in full public view.
  * A hash of the encrypted data is generated for integrity-check and is prefixed to the encrypted_text.
  *
- * Instruction (no secret key provided as argument):
+ * Instruction (no secret key provided as argument, so private static value is used):
  * encryption:  $encrypted_txt    = Cryptor::doEncrypt($plain_txt);
  * decryption:  $plain_txt        = Cryptor::doDecrypt($encrypted_txt);
  *
@@ -88,7 +88,7 @@ class Cryptor {
        
        $encrypted_txt = substr($encrypted_txt, 0, -1);
        
-       // smaller parts were glued together with underscore (_) and replaced by a letter 
+       // smaller parts are glued together with underscore (_) and will be replaced by a letter 
        
        $encrypted_txt = self::replace("go", $encrypted_txt);
        
@@ -130,7 +130,7 @@ class Cryptor {
        if ($hash !== $hash_on_the_fly) { return null; }
        
        
-       // smaller parts were glued together with underscore (_) and replaced by a letter      
+       // smaller parts are glued together with underscore (_) and replaced by a letter      
        
        $encrypted_txt   = self::replace("back", $encrypted_txt);
 
