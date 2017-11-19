@@ -130,7 +130,7 @@ class Cryptor {
        if ($hash !== $hash_on_the_fly) { return null; }
        
        
-       // smaller parts are glued together with underscore (_) and replaced by a letter      
+       // smaller parts were glued together with underscore (_) and replaced by a letter      
        
        $encrypted_txt   = self::replace("back", $encrypted_txt);
 
