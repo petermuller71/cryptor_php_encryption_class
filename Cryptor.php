@@ -76,7 +76,7 @@ class Cryptor {
        if ($secretkey == null) { $secretkey = self::$secret_key; }    
         
        // add salt to plain_text 
-       // salt is actually a nonce (unpredictable random number), so encryption of the same plain_text will leads always to different encrypted_texts  
+       // salt is actually a nonce (unpredictable random number), so encryption of the same plain_text leads always to different encrypted_txts  
        
        $salt      = substr( base64_encode(openssl_random_pseudo_bytes(16)), 0, 10);    
        $plain_txt = $salt.$plain_txt;
