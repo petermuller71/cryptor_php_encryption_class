@@ -2,7 +2,7 @@
 
 /************************************************************************************************************************************************
  *
- * Class:  Cryptor
+ * Class:  Cryptor  
  * 
  * PHP Encryption and decryption class with open_ssl
  * 
@@ -20,6 +20,9 @@
  * Instruction (with secret key):
  * encryption:  $encrypted_txt    = Cryptor::doEncrypt($plain_txt, "secret key used for encryption");
  * decryption:  $plain_txt        = Cryptor::doDecrypt($encrypted_txt, "secret key used for encryption");
+ *
+ * Instruction to encrypt json data
+ * encryption: Cryptor::doEncrypt($json, "secretpassword", $json = TRUE);
  *
  * Change class properties (change secret keys, etc)!
  *
@@ -49,11 +52,11 @@ class Cryptor {
      * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
      * @copyright  2017 Peter Muller. All rights reserved.
      * @author     Peter Muller <petermuller71@gmail.com>
-     * @version    1.05
+     * @version    1.06
      *
      */
     
-    static private $strspit_nr = 350;                     // smaller than 400 characters!                    
+    static private $strspit_nr = 400;                     // smaller than 400 characters!                    
     static private $rep_letter = 'b';                     // change this (any letter, small or Capital)!
     static private $secret_key = 'This is my secret key'; // change this! (this value is used if secret_key is not passed as argument) 
     
@@ -68,15 +71,28 @@ class Cryptor {
      *
      */
     
-    public static function doEncrypt($plain_txt, $secretkey = null) {
+    public static function doEncrypt($plain_txt, $secretkey = null, $json=FALSE) {
 
        if ($secretkey == null) { $secretkey = self::$secret_key; }    
-        
+
+       // encrypting json data is a problem, \r\n\t must be deleted in order to be decoded back into json correctly
+       // use: Cryptor::doEncrypt($json, "secretpassword", $json = TRUE);
+       
+       if ($json == TRUE) 
+       {
+           $plain_txt = str_replace("\r",'', $plain_txt);
+           $plain_txt = str_replace("\n",'', $plain_txt);
+           $plain_txt = str_replace("\t",'', $plain_txt);
+       }
+       
        // add salt to plain_text 
        // salt is actually a nonce (unpredictable random number), so encryption of the same plain_text leads always to different encrypted_txts  
+  
        
        $salt      = substr( base64_encode(openssl_random_pseudo_bytes(16)), 0, 10);    
        $plain_txt = $salt.$plain_txt;
+       
+       
        
        // plain_txt should be split in smaller parts and encrypted seperatly (because of open_ssl / RSA limitation)
       
@@ -207,17 +223,59 @@ class Cryptor {
     
         if ($action == "go")
         {
-            $source     = str_replace(self::$rep_letter, "$", $source);
+            $source     = str_replace(self::$rep_letter, "|", $source);
             $source     = str_replace("_", self::$rep_letter, $source);
         }
         else if ($action == "back")
         {
             $source     = str_replace(self::$rep_letter, "_", $source);
-            $source     = str_replace("$", self::$rep_letter, $source);
+            $source     = str_replace("|", self::$rep_letter, $source);
         }
     
         return $source;
     }   
-   
+
+    
+    
+    
+    public static function generateKeypair() {
+        
+        $config = array(
+            "digest_alg" => "sha512",
+            "private_key_bits" => 4096,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        );
+        
+        // Create the private and public key
+        $res = openssl_pkey_new($config);
+        
+        openssl_pkey_export($res, $privKey);
+        
+        // Extract the public key from $res to $pubKey
+        $pubKey = openssl_pkey_get_details($res);
+        
+        $key['privatekey'] = $privKey;
+        $key['publickey']  = $pubKey["key"];
+        
+        return $key;        
+    }
+    
+    public static function publicEncrypt($source, $publickey) {
+    
+        openssl_public_encrypt($source, $encrypted, $publickey);
+        
+        $encrypted = base64_encode($encrypted);
+        
+        return $encrypted;
+    }
+    
+    public static function privateDecrypt($source, $pirvatekey) {
+        
+        $source = base64_decode($source);
+        
+        openssl_private_decrypt($source, $decrypted, $pirvatekey);
+        
+        return $decrypted;
+    }    
 }
 ?>
