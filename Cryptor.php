@@ -21,9 +21,6 @@
  * encryption:  $encrypted_txt    = Cryptor::doEncrypt($plain_txt, "secret key used for encryption");
  * decryption:  $plain_txt        = Cryptor::doDecrypt($encrypted_txt, "secret key used for encryption");
  *
- * Instruction to encrypt json data
- * encryption: Cryptor::doEncrypt($json, "secretpassword", $json = TRUE);
- *
  * Change class properties (change secret keys, etc)!
  *
  *************************************************************************************************************************************************/
@@ -71,20 +68,10 @@ class Cryptor {
      *
      */
     
-    public static function doEncrypt($plain_txt, $secretkey = null, $json=FALSE) {
+    public static function doEncrypt($plain_txt, $secretkey = null) {
 
        if ($secretkey == null) { $secretkey = self::$secret_key; }    
-
-       // encrypting json data is a problem, \r\n\t must be deleted in order to be decoded back into json correctly
-       // use: Cryptor::doEncrypt($json, "secretpassword", $json = TRUE);
-       
-       if ($json == TRUE) 
-       {
-           $plain_txt = str_replace("\r",'', $plain_txt);
-           $plain_txt = str_replace("\n",'', $plain_txt);
-           $plain_txt = str_replace("\t",'', $plain_txt);
-       }
-       
+      
        // add salt to plain_text 
        // salt is actually a nonce (unpredictable random number), so encryption of the same plain_text leads always to different encrypted_txts  
   
