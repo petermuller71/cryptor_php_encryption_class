@@ -84,7 +84,7 @@ class Cryptor {
        // plain_txt should be split in smaller parts and encrypted seperatly (because of open_ssl / RSA limitation)
       
        $arr = str_split($plain_txt, self::$strspit_nr);
-       foreach ($arr as $v) { $encrypted_txt .= substr(self::doEncryptDecrypt('encrypt', $secretkey, $v), 0, -2)."_"; }
+       foreach ($arr as $v) { $encrypted_txt .= self::doEncryptDecrypt('encrypt', $secretkey, $v)."_"; }
        
        $encrypted_txt = substr($encrypted_txt, 0, -1);
        
