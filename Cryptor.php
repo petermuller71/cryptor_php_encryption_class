@@ -47,9 +47,9 @@ class Cryptor {
      * @return     string       Encrypted or decrypted text
      *
      * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
-     * @copyright  2017 Peter Muller. All rights reserved.
+     * @copyright  2018 Peter Muller. All rights reserved.
      * @author     Peter Muller <petermuller71@gmail.com>
-     * @version    1.06
+     * @version    1.07
      *
      */
     
