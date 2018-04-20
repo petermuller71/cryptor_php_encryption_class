@@ -49,7 +49,7 @@ class Cryptor {
      * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
      * @copyright  2018 Peter Muller. All rights reserved.
      * @author     Peter Muller <petermuller71@gmail.com>
-     * @version    1.07
+     * @version    1.08
      *
      */
     
@@ -220,49 +220,6 @@ class Cryptor {
         }
     
         return $source;
-    }   
-
-    
-    
-    
-    public static function generateKeypair() {
-        
-        $config = array(
-            "digest_alg" => "sha512",
-            "private_key_bits" => 4096,
-            "private_key_type" => OPENSSL_KEYTYPE_RSA,
-        );
-        
-        // Create the private and public key
-        $res = openssl_pkey_new($config);
-        
-        openssl_pkey_export($res, $privKey);
-        
-        // Extract the public key from $res to $pubKey
-        $pubKey = openssl_pkey_get_details($res);
-        
-        $key['privatekey'] = $privKey;
-        $key['publickey']  = $pubKey["key"];
-        
-        return $key;        
-    }
-    
-    public static function publicEncrypt($source, $publickey) {
-    
-        openssl_public_encrypt($source, $encrypted, $publickey);
-        
-        $encrypted = base64_encode($encrypted);
-        
-        return $encrypted;
-    }
-    
-    public static function privateDecrypt($source, $pirvatekey) {
-        
-        $source = base64_decode($source);
-        
-        openssl_private_decrypt($source, $decrypted, $pirvatekey);
-        
-        return $decrypted;
-    }    
+    }     
 }
 ?>
