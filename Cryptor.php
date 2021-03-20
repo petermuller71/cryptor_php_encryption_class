@@ -48,7 +48,7 @@ class Cryptor {
      *
      * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
      * @copyright  2018 Peter Muller. All rights reserved.
-     * @author     Peter Muller <petermuller71@gmail.com>
+     * @author     Peter Muller
      * @version    1.08
      *
      */
